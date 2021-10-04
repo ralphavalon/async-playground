@@ -1,0 +1,41 @@
+version: '3'
+services:
+  order:
+    build:
+      context: .
+      dockerfile: order/.devcontainer/Dockerfile
+    volumes:
+      # Mount the root folder that contains .git
+      - .:/workspace:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  payment:
+    build:
+      context: .
+      dockerfile: payment/.devcontainer/Dockerfile
+    volumes:
+      # Mount the root folder that contains .git
+      - .:/workspace:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    links:
+      - order
+
+  product:
+    build:
+      context: .
+      dockerfile: product/.devcontainer/Dockerfile
+    volumes:
+      # Mount the root folder that contains .git
+      - .:/workspace:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    links:
+      - order
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: username
+      # MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: async_db
+    ports:
+      - 27017:27017

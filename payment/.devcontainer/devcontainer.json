@@ -1,0 +1,20 @@
+{
+	"name": "PaymentAPI",
+	"dockerComposeFile": ["../../docker-compose-vscode.yml"],
+	"service": "payment",
+	"workspaceFolder": "/workspace/payment",
+	"settings": {
+		// "terminal.integrated.shell.linux": "/bin/bash",
+		"java.home": "/usr/local/openjdk-15"
+	},
+	"extensions": [
+		"vscjava.vscode-java-pack",
+		"gabrielbb.vscode-lombok",
+		"pivotal.vscode-boot-dev-pack"
+	],
+	"forwardPorts": [
+		8081
+	],
+	"postCreateCommand": "test -f pom.xml && mvn dependency:copy-dependencies",
+	"remoteUser": "vscode"
+}
