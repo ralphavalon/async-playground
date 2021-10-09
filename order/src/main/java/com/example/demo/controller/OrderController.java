@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.example.demo.controller.request.CreateOrderRequest;
+import com.example.demo.messaging.KafkaProducer;
 import com.example.demo.model.Order;
 import com.example.demo.model.Payment;
 import com.example.demo.model.Product;
@@ -26,27 +27,34 @@ public class OrderController {
     @Autowired
     private OrderRepository repository;
 
+    @Autowired
+    private KafkaProducer kafkaProducer;
+
     @PostMapping
-    public Mono<Order> createOrder(@RequestBody @Validated CreateOrderRequest request) {
+    public Mono<CreateOrderRequest> createOrder(@RequestBody @Validated CreateOrderRequest request) {
+        return Mono.just(request)
+            .doOnNext(r -> {
+                kafkaProducer.send(r.toString());
+            });
         // do your async code
-        return repository.save(Order.builder()
-                    .id(UUID.randomUUID().toString())
-                    .payment(Payment.builder()
-                            .id(UUID.randomUUID().toString())
-                            .method(request.getPayment().getMethod())
-                            .amount(new BigDecimal("200.10"))
-                            .status("PAID")
-                            .build())
-                    .products(request.getProducts().stream().map(p -> Product.builder()
-                                                                .id(p.getId())
-                                                                .name("Random")
-                                                                .quantity(p.getQuantity())
-                                                                .price(new BigDecimal("20.50"))
-                                                                .build()).collect(Collectors.toList()))
-                    .status("PAID")
-                    .total(new BigDecimal("200.10"))
-                    .userId(request.getUserId())
-                    .build());
+        // return repository.save(Order.builder()
+        //             .id(UUID.randomUUID().toString())
+        //             .payment(Payment.builder()
+        //                     .id(UUID.randomUUID().toString())
+        //                     .method(request.getPayment().getMethod())
+        //                     .amount(new BigDecimal("200.10"))
+        //                     .status("PAID")
+        //                     .build())
+        //             .products(request.getProducts().stream().map(p -> Product.builder()
+        //                                                         .id(p.getId())
+        //                                                         .name("Random")
+        //                                                         .quantity(p.getQuantity())
+        //                                                         .price(new BigDecimal("20.50"))
+        //                                                         .build()).collect(Collectors.toList()))
+        //             .status("PAID")
+        //             .total(new BigDecimal("200.10"))
+        //             .userId(request.getUserId())
+        //             .build());
     }
     
 }
